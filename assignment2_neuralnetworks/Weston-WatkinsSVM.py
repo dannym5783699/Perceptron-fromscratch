@@ -15,7 +15,9 @@ class WestonWatkinsSVM:
     def outVals(self, x):
         #Get vector of predictions.
         predicts = np.dot(self.weights, x)
-        return predicts.reshape(-1, 1)
+        #Add bias and reshape for final class prediction and loss.
+        return (predicts.reshape(-1, 1) + self.bias)
+    
     
     def forward(self, x):
         out = self.outVals(x)
@@ -53,11 +55,13 @@ class WestonWatkinsSVM:
                 indicator = np.where(lossContr > 0, 1, 0).reshape(-1,1)
                 #get the sum of the indicator elements for correct neuron weight updates.
                 sIndicator = np.sum(indicator)
-                #update the weights
+                #update the weights and bias.
                 for w in range(self.classes):
                     if(w == y[i]):
+                        self.bias[w, 0] = self.bias[w, 0] + ((self.learnRate)*(sIndicator))
                         self.weights[w, :] = self.weights[w, :] + ((self.learnRate*sample.T)*(sIndicator))
                     else:
+                        self.bias[w, 0] = self.bias[w, 0] - ((self.learnRate)*(indicator[w, 0]))
                         self.weights[w, :] = self.weights[w, :] - ((self.learnRate*sample.T)*(indicator[w, 0]))
 
                 #TODO: uncomment bias and update them.
@@ -75,7 +79,7 @@ if __name__ == "__main__":
     #x1 = np.array([[2], [20]])
     #y1 = np.array([0])
     #model.fit(x1, y1)
-    #testing some obvious points, first should be 1, second should be 0.
+    #testing some obvious points, first should be 0, second should be 1.
     print(model.forward([[2], [20]]))
     print(model.forward([[11],[53]]))
     print(model.forward([[3],[19]]))
@@ -86,18 +90,19 @@ if __name__ == "__main__":
 
     
     #Change number of classes and features here.
-    numClass = 3
-    numFeat = 4
-    classSep = 5.0
+    numClass = 5
+    numFeat = 10
+    classSep = 3.0
+    learningRate = 0.0005
 
-    testDataX, testDataY = make_classification(n_features=numFeat, n_samples=10000, n_clusters_per_class=1,
+    testDataX, testDataY = make_classification(n_features=numFeat, n_samples=50000, n_clusters_per_class=1,
                                                    n_informative=numFeat,
                                                    n_redundant=0, scale=5, n_classes=numClass, class_sep=classSep)
 
     xTrain, xTest, yTrain, yTest = train_test_split(testDataX, testDataY,
                                                     test_size=0.05, random_state=10)
     
-    model3 = WestonWatkinsSVM(numFeat,numClass)
+    model3 = WestonWatkinsSVM(numFeat,numClass, learningRate)
     xTrain = xTrain.T
     xTest = xTest.T
     model3.fit(xTrain[:numFeat], yTrain.T, 100)
