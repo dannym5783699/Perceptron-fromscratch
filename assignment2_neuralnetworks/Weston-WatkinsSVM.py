@@ -70,23 +70,11 @@ class WestonWatkinsSVM:
 
 if __name__ == "__main__":
     #testing obviously seperable data.
-    path = r'docs\wwSVMtestData.csv'
-    data = np.genfromtxt(path, delimiter=',', dtype=np.float32, skip_header=1)
-    x = np.array([[2, 3, 4, 1, 10, 12, 13], [20, 21, 19, 18, 50, 51, 52]])
-    y = np.array([0,0,0,0,1,1,1])
-    model = WestonWatkinsSVM(2, 2)
-    model.fit(x, y)
     #x1 = np.array([[2], [20]])
     #y1 = np.array([0])
     #model.fit(x1, y1)
     #testing some obvious points, first should be 0, second should be 1.
-    print(model.forward([[2], [20]]))
-    print(model.forward([[11],[53]]))
-    print(model.forward([[3],[19]]))
-    model2 = WestonWatkinsSVM(2,2)
-    data = data.T
-    model2.fit(data[:2], data[-1, :])
-    print(model2.forward([[60],[5]]))
+
 
     
     #Change number of classes and features here.
