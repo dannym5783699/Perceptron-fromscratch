@@ -92,12 +92,12 @@ if __name__ == "__main__":
     #Change number of classes and features here.
     numClass = 5
     numFeat = 10
-    classSep = 3.0
+    classSep = 2.0
     learningRate = 0.0005
 
     testDataX, testDataY = make_classification(n_features=numFeat, n_samples=50000, n_clusters_per_class=1,
-                                                   n_informative=numFeat,
-                                                   n_redundant=0, scale=5, n_classes=numClass, class_sep=classSep)
+                                                   n_informative=numFeat-5,
+                                                   n_redundant=1, scale=5, n_classes=numClass, class_sep=classSep)
 
     xTrain, xTest, yTrain, yTest = train_test_split(testDataX, testDataY,
                                                     test_size=0.05, random_state=10)
