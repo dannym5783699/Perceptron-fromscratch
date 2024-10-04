@@ -129,7 +129,7 @@ class WidrowHoff:
             e_squared_total /= n_samples
 
             # Check if error is below tolerance
-            print(f"Mean squared error: {e_squared_total}")
+            print(f"\tMean squared error: {e_squared_total}")
             if e_squared_total < self._tol:
                 if self._verbose > 0:
                     print(f"Converged in {current_epoch} iterations.")
