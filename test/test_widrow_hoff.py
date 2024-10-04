@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from cases import test_cases
+from sklearn.datasets import make_regression
 
 from assignment2_neuralnetworks.generate_binary_data import generate_binary_data
 from assignment2_neuralnetworks.widrow_hoff import WidrowHoff  # Assuming you've renamed it
@@ -21,11 +22,17 @@ def main():
         #     test_case.case_condition, n_features=test_case.n_features, seed=90
         # )
 
-        # arr_x = np.array([[1.23, 1.45], [1.534, 1.256]])
-        # arr_y = np.array([1, -1])
-
         # Create a Widrow-Hoff object and fit to data
         model = WidrowHoff(n_features=2, lr=0.01, max_epochs=5, verbose=1, tol=1e-7)
+        model.fit(X_train, y_train)
+
+        # Generate synthetic regression data
+        X_train, y_train = make_regression(n_samples=100, n_features=2, noise=0.1, random_state=42)
+
+        # Initialize the WidrowHoff model
+        model = WidrowHoff(n_features=2, lr=0.01, max_epochs=100, verbose=1)
+
+        # Train the model using the generated data
         model.fit(X_train, y_train)
 
         # # Plot the decision boundary
