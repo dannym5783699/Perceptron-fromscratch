@@ -1,4 +1,7 @@
+
+import sys
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class WidrowHoff:
@@ -12,7 +15,8 @@ class WidrowHoff:
             tol: float = 1e-4,
             max_epochs=100,
             verbose: int = 0,
-            useBias: bool = False
+            useBias: bool = False,
+            plot: bool = False  # Added plot flag
     ) -> None:
         """Widrow-Hoff (LMS) learning model with a single output.
 
@@ -22,6 +26,7 @@ class WidrowHoff:
             tol (float, optional): Tolerance. Defaults to 1e-4.
             max_epochs (int, optional): Max number of epochs when training. Defaults to 100.
             verbose (int, optional): Verbosity option to output progress. Defaults to 0.
+            plot (bool, optional): Whether to plot the error over epochs. Defaults to False.
         """
         self._n_features = n_features
         self._lr = lr
@@ -33,6 +38,8 @@ class WidrowHoff:
         self._W = rng.uniform(self._LOWER_BOUND, self._UPPER_BOUND, self._n_features)
         self._b = rng.uniform(self._LOWER_BOUND, self._UPPER_BOUND)
         self._useBias = useBias
+        self._plot = plot  # Initialize plot flag
+        self._e_squared_totals = []  # Store error values for plotting
 
     def _validate_input(self, x: np.ndarray, y: np.ndarray) -> None:
         if x.shape[1] != self._n_features:
@@ -128,14 +135,36 @@ class WidrowHoff:
 
             e_squared_total /= n_samples
 
+            # Store the mean squared error for plotting
+            self._e_squared_totals.append(e_squared_total)
+
             # Check if error is below tolerance
-            print(f"\tMean squared error: {e_squared_total}")
+            if self._verbose > 0:
+                print(f"\tMean squared error: {e_squared_total}")
             if e_squared_total < self._tol:
                 if self._verbose > 0:
                     print(f"Converged in {current_epoch} iterations.")
                     print(f"Finished training with {n_samples} samples.")
                     print(f"Final weights: {self._W}")
-                    return
+                break
+            sys.stdout.write(f"\rPercent Complete: {((current_epoch / self._max_epochs)*100):.4f}%")
+            sys.stdout.flush()
 
-        print(f"Finished training with {n_samples} samples.")
-        print(f"Final weights: {self._W}")
+        # Plot the error over epochs if plot flag is set
+        if self._plot:
+            self.plot_error()
+
+        print(f"\rFinished training with {n_samples} samples.")
+        if self._verbose > 0:
+            print(f"Final weights: {self._W}")
+
+    def plot_error(self) -> None:
+        """Plots the mean squared error over epochs."""
+        plt.figure(figsize=(8, 6))
+        plt.plot(self._e_squared_totals, label="Mean Squared Error")
+        plt.xlabel("Epoch")
+        plt.ylabel("Mean Squared Error")
+        plt.title("Mean Squared Error over Epochs")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
