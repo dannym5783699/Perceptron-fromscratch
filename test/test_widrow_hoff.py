@@ -1,9 +1,6 @@
 import os
 import sys
 
-import matplotlib.pyplot as plt
-import numpy as np
-import seaborn as sns
 from cases import test_cases
 from sklearn.datasets import make_regression
 
