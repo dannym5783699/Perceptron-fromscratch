@@ -100,7 +100,11 @@ class WidrowHoff:
 
                 # Computing error
                 e_i = y_i - y_hat
-                e_squared = e_i * e_i
+
+                # If e_i is an array, sum its squared values
+                e_squared = np.sum(e_i ** 2)
+
+                # Accumulate the scalar squared error
                 e_squared_total += e_squared
                 if self._verbose == 2:
                     print("\tError: ", e_i, e_squared)
@@ -120,7 +124,7 @@ class WidrowHoff:
 
                 self._W = w_new
                 if self._useBias:
-                    self._b += self._lr * error_m
+                    self._b = self._b + self._lr * e_i
 
             e_squared_total /= n_samples
 
