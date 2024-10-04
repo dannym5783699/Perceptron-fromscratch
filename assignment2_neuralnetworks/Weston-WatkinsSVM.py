@@ -3,20 +3,20 @@ from sklearn.datasets import make_blobs, make_classification, make_gaussian_quan
 
 import numpy as np
 class WestonWatkinsSVM:
-    def __init__(self, inDem, classes, learnRate = 0.1):
+    def __init__(self, n_features, n_classes, lr = 0.1):
         #create a (classes, inDem) weight array for all output neurons depending on inputs and classes.
-        self.weights = np.random.rand(classes, inDem)
+        self._W = np.random.rand(n_classes, n_features)
         #create a random bias vector
-        self.bias = np.random.rand(classes, 1)
-        self.learnRate = learnRate
-        self.classes = classes
+        self._b = np.random.rand(n_classes)
+        self._lr = lr
+        self.n_classes = n_classes
 
 
     def outVals(self, x):
         #Get vector of predictions.
-        predicts = np.dot(self.weights, x)
+        y_hat = np.dot(self._W, x)
         #Add bias and reshape for final class prediction and loss.
-        return (predicts.reshape(-1, 1) + self.bias)
+        return (y_hat.reshape(-1, 1) + self._b)
     
     
     def forward(self, x):
@@ -25,12 +25,12 @@ class WestonWatkinsSVM:
         return np.argmax(out)
     
     #determine individual loss contribution from each output neuron for a specific sample.
-    def indLoss(self, y, predictions):
-        loss = np.zeros(self.classes)
+    def indLoss(self, y, y_hat):
+        loss = np.zeros(self.n_classes)
         #get loss contribution of each neuron, correct neuron is set to 0.
-        for i in range(self.classes):
+        for i in range(self.n_classes):
             if(i != y):
-                loss[i] = max(0, predictions[i, 0] - predictions[int(y), 0] + 1)
+                loss[i] = max(0, y_hat[i, 0] - y_hat[int(y), 0] + 1)
             else:
                 #Loss contribution for the correct neuron is set to zero.
                 loss[i] = 0;  
@@ -46,23 +46,23 @@ class WestonWatkinsSVM:
             #expects a column vector for x and y.
             for i in range(len(y)):
                 #get column vector for a single sample.
-                sample = x[:,i]
+                x_i = x[:,i]
                 #get the outputs of the output neurons.
-                predictions = self.outVals(sample)
+                y_hat = self.outVals(x_i)
                 #get the array of loss contributions for weight updates.
-                lossContr = self.indLoss(y[i], predictions)
+                lossContr = self.indLoss(y[i], y_hat)
                 #Using the indicator function on each element.
                 indicator = np.where(lossContr > 0, 1, 0).reshape(-1,1)
                 #get the sum of the indicator elements for correct neuron weight updates.
                 sIndicator = np.sum(indicator)
                 #update the weights and bias.
-                for w in range(self.classes):
+                for w in range(self.n_classes):
                     if(w == y[i]):
-                        self.bias[w, 0] = self.bias[w, 0] + ((self.learnRate)*(sIndicator))
-                        self.weights[w, :] = self.weights[w, :] + ((self.learnRate*sample.T)*(sIndicator))
+                        self._b[w, 0] = self._b[w, 0] + ((self._lr)*(sIndicator))
+                        self._W[w, :] = self._W[w, :] + ((self._lr*x_i.T)*(sIndicator))
                     else:
-                        self.bias[w, 0] = self.bias[w, 0] - ((self.learnRate)*(indicator[w, 0]))
-                        self.weights[w, :] = self.weights[w, :] - ((self.learnRate*sample.T)*(indicator[w, 0]))
+                        self._b[w, 0] = self._b[w, 0] - ((self._lr)*(indicator[w, 0]))
+                        self._W[w, :] = self._W[w, :] - ((self._lr*x_i.T)*(indicator[w, 0]))
 
                 #TODO: uncomment bias and update them.
 
