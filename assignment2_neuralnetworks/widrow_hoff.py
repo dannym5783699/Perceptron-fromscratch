@@ -6,13 +6,13 @@ class WidrowHoff:
     _UPPER_BOUND = 1.0
 
     def __init__(
-        self,
-        n_features: int,
-        lr: float = 0.01,
-        tol: float = 1e-4,
-        max_epochs=100,
-        verbose: int = 0,
-        useBias: bool = False
+            self,
+            n_features: int,
+            lr: float = 0.01,
+            tol: float = 1e-4,
+            max_epochs=100,
+            verbose: int = 0,
+            useBias: bool = False
     ) -> None:
         """Widrow-Hoff (LMS) learning model with a single output.
 
@@ -61,7 +61,11 @@ class WidrowHoff:
         Returns:
             np.ndarray: Continuous output result (not discretized).
         """
-        y_hat = np.dot(x, self._W) + self._b
+        if self._useBias:
+            y_hat = np.dot(x, self._W) + self._b
+            return y_hat
+        else:
+            y_hat = np.dot(x, self._W)
         return y_hat
 
     def fit(self, x: np.ndarray, y: np.ndarray) -> None:
@@ -87,65 +91,47 @@ class WidrowHoff:
             e_squared_total = 0.0
 
             for i, (x_i, y_i) in enumerate(zip(x, y)):
-
-                if self._useBias:
-                    # Computing y_hat
+                if self._verbose == 2:
                     print("Data: ", x_i, y_i)
-                    print("\tOG Params: ", self._W, self._b)
-                    y_i_hat = np.dot(x_i, self._W) + self._b
-                    print("\tY Hat: ", y_i_hat)
+                    print("\tOG Params: ", self._W)
+                y_hat = self.forward(x_i)
+                if self._verbose == 2:
+                    print("\tY Hat: ", y_hat)
 
-                    # Computing error
-                    e_i = y_i - y_i_hat
-                    e_squared = e_i * e_i
-                    e_squared_total += e_squared
-                    print("\tError: ", e_i)
+                # Computing error
+                e_i = y_i - y_hat
+                e_squared = e_i * e_i
+                e_squared_total += e_squared
+                if self._verbose == 2:
+                    print("\tError: ", e_i, e_squared)
 
-                    # Updating params
-                    error_m = np.dot(e_i, x_i)
+                # Updating params
+                error_m = np.dot(e_i, x_i.T)
+                if self._verbose == 2:
                     print("\tError applied to X: ", error_m)
 
-                    w_change = np.dot(self._lr, error_m)
+                w_change = np.dot(self._lr, error_m)
+                if self._verbose == 2:
                     print("\tError with Tol: ", w_change)
 
-                    w_new = np.subtract(self._W, w_change)
-                    b_new = self._b + (e_i*self._lr)
-                    print("\tNew Params: ", w_new, b_new)
+                w_new = np.add(self._W, w_change)
+                if self._verbose == 2:
+                    print("\tNew Params: ", w_new)
 
-                    self._b = b_new
-                    self._W = w_new
-                else:
-                    if self._verbose == 2:
-                        print("Data: ", x_i, y_i)
-                        print("\tOG Params: ", self._W)
-                    y_i_hat = np.dot(self._W, x_i)
-                    if self._verbose == 2:
-                        print("\tY Hat: ", y_i_hat)
-
-                    # Computing error
-                    e_i = y_i - y_i_hat
-                    e_squared = e_i * e_i
-                    e_squared_total += e_squared
-                    if self._verbose == 2:
-                        print("\tError: ", e_i, e_squared)
-
-                    # Updating params
-                    error_m = np.dot(e_i, x_i.T)
-                    if self._verbose == 2:
-                        print("\tError applied to X: ", error_m)
-
-                    w_change = np.dot(self._lr, error_m)
-                    if self._verbose == 2:
-                        print("\tError with Tol: ", w_change)
-
-                    w_new = np.add(self._W, w_change)
-                    if self._verbose == 2:
-                        print("\tNew Params: ", w_new)
-
-                    self._W = w_new
+                self._W = w_new
+                if self._useBias:
+                    self._b += self._lr * error_m
 
             e_squared_total /= n_samples
+
+            # Check if error is below tolerance
             print(f"Mean squared error: {e_squared_total}")
+            if e_squared_total < self._tol:
+                if self._verbose > 0:
+                    print(f"Converged in {current_epoch} iterations.")
+                    print(f"Finished training with {n_samples} samples.")
+                    print(f"Final weights: {self._W}")
+                    return
 
         print(f"Finished training with {n_samples} samples.")
         print(f"Final weights: {self._W}")
