@@ -14,7 +14,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 def main():
     for test_case in test_cases[:1]:
         X_train, y_train = generate_binary_data(
-            test_case.case_condition, n_samples=2, n_features=test_case.n_features
+            test_case.case_condition, n_samples=100, n_features=test_case.n_features
         )
 
         # X_test, y_test = generate_binary_data(
@@ -25,7 +25,7 @@ def main():
         # arr_y = np.array([1, -1])
 
         # Create a Widrow-Hoff object and fit to data
-        model = WidrowHoff(n_features=2, lr=0.00001, max_epochs=1, verbose=2, tol=1e-7)
+        model = WidrowHoff(n_features=2, lr=0.01, max_epochs=5, verbose=1, tol=1e-7)
         model.fit(X_train, y_train)
 
         # # Plot the decision boundary
