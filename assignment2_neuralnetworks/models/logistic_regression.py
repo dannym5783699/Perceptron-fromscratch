@@ -3,7 +3,7 @@ from sklearn.datasets import make_classification
 import numpy as np
 
 class LogisticRegression:
-    def __init__(self, lr=0.01, max_epochs=1000):
+    def __init__(self, lr=0.01, max_epochs=1000, verbose=0):
         """
         Initialize the Logistic Regression model with:
         learning_rate: The rate at which the model learns
@@ -13,6 +13,7 @@ class LogisticRegression:
         self.epochs = max_epochs
         self.weights = None
         self.bias = None
+        self.verbose = verbose
 
     def sigmoid(self, z):
         """
@@ -46,9 +47,10 @@ class LogisticRegression:
             self.bias -= self.learning_rate * db
 
             # Optionally, print the cost for every 100 epochs for better insight
-            if epoch % 100 == 0:
-                cost = -(1 / n_samples) * np.sum(y * np.log(y_predicted) + (1 - y) * np.log(1 - y_predicted))
-                print(f"Epoch {epoch}/{self.epochs}, Cost: {cost}")
+            if self.verbose:
+                if epoch % 100 == 0:
+                    cost = -(1 / n_samples) * np.sum(y * np.log(y_predicted) + (1 - y) * np.log(1 - y_predicted))
+                    print(f"Epoch {epoch}/{self.epochs}, Cost: {cost}")
 
     def predict(self, X):
         """

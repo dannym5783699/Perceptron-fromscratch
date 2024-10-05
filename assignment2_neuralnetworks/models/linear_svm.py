@@ -4,12 +4,13 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 
 class LinearSVM:
-    def __init__(self, lr=0.001, lambda_param=0.01, max_epochs=1000):
+    def __init__(self, lr=0.001, lambda_param=0.01, max_epochs=1000, verbose=0):
         self.learning_rate = lr
         self.lambda_param = lambda_param
         self.n_iters = max_epochs
         self.weights = None
         self.bias = None
+        self.verbose = verbose
 
     def fit(self, X, y):
         n_samples, n_features = X.shape
@@ -32,8 +33,9 @@ class LinearSVM:
                 np.maximum(0, 1 - y_ * (np.dot(X, self.weights) + self.bias)))
             loss_history.append(loss)
 
-            if epoch % 100 == 0:
-                print(f"Epoch {epoch}, Loss: {loss:.4f}")
+            if self.verbose:
+                if epoch % 100 == 0:
+                    print(f"Epoch {epoch}, Loss: {loss:.4f}")
 
         return loss_history
 
