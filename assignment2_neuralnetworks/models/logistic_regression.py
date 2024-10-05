@@ -3,14 +3,14 @@ from sklearn.datasets import make_classification
 import numpy as np
 
 class LogisticRegression:
-    def __init__(self, learning_rate=0.01, epochs=1000):
+    def __init__(self, lr=0.01, max_epochs=1000):
         """
         Initialize the Logistic Regression model with:
         learning_rate: The rate at which the model learns
         epochs: Number of complete passes through the training data
         """
-        self.learning_rate = learning_rate
-        self.epochs = epochs
+        self.learning_rate = lr
+        self.epochs = max_epochs
         self.weights = None
         self.bias = None
 
@@ -59,6 +59,9 @@ class LogisticRegression:
         y_predicted = self.sigmoid(linear_model)
         y_predicted_cls = [1 if i > 0.5 else 0 for i in y_predicted]
         return np.array(y_predicted_cls)
+    
+    def forward(self, X):
+        return self.predict(X)
 
 
 # Example usage of Logistic Regression

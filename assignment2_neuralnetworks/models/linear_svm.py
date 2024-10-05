@@ -4,10 +4,10 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 
 class LinearSVM:
-    def __init__(self, learning_rate=0.001, lambda_param=0.01, n_iters=1000):
-        self.learning_rate = learning_rate
+    def __init__(self, lr=0.001, lambda_param=0.01, max_epochs=1000):
+        self.learning_rate = lr
         self.lambda_param = lambda_param
-        self.n_iters = n_iters
+        self.n_iters = max_epochs
         self.weights = None
         self.bias = None
 
@@ -41,6 +41,9 @@ class LinearSVM:
         linear_output = np.dot(X, self.weights) + self.bias
         predictions = np.where(linear_output >= 0, 1, 0)
         return predictions
+    
+    def forward(self, X):
+        return self.predict(X)
 
 if __name__ == "__main__":
     numClass = 2
