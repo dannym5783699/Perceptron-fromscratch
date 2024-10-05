@@ -1,5 +1,5 @@
 from sklearn.model_selection import train_test_split
-from sklearn.datasets import make_blobs, make_classification, make_gaussian_quantiles
+from sklearn.datasets import load_iris
 
 import numpy as np
 class WestonWatkinsSVM:
@@ -44,45 +44,24 @@ class WestonWatkinsSVM:
 
 
 if __name__ == "__main__":
-    #testing obviously seperable data.
-    #x1 = np.array([[2], [20]])
-    #y1 = np.array([0])
-    #model.fit(x1, y1)
-    #testing some obvious points, first should be 0, second should be 1.
 
+    LR = 1e-4
 
-    
-    #Change number of classes and features here.
-    numClass = 5
-    numFeat = 10
-    classSep = 2.0
-    learningRate = 0.0005
+    X, y = load_iris(return_X_y=True)
+    n_features = X.shape[1]
+    n_classes = np.unique(y).shape[0]
 
-    testDataX, testDataY = make_classification(n_features=numFeat, n_samples=50000, n_clusters_per_class=1,
-                                                   n_informative=numFeat-5,
-                                                   n_redundant=1, scale=5, n_classes=numClass, class_sep=classSep)
+    X_train, X_test, y_train, y_test  = train_test_split(X, y, test_size=0.3, random_state=10, stratify=y)
 
-    xTrain, xTest, yTrain, yTest = train_test_split(testDataX, testDataY,
-                                                    test_size=0.05, random_state=10)
-    
-    model3 = WestonWatkinsSVM(numFeat,numClass, learningRate)
-    xTrain = xTrain.T
-    xTest = xTest.T
-    model3.fit(xTrain[:numFeat], yTrain.T, 100)
-    totalCorrect = 0
-    for i in range(len(yTest)):
-        if(model3.forward(xTest[:, i]) == yTest[i]):
-            totalCorrect += 1
+    print("Training data shape: ", X_train.shape)
+    print("Testing data shape: ", X_test.shape)
+    print("Number of classes: ", n_classes)
 
-    print("accuracy = ", (totalCorrect/len(yTest)*100), "%")        
+    # Train model    
+    model = WestonWatkinsSVM(n_features, n_classes, LR)
+    model.fit(X_train, y_train, 500)
 
-
-
-
-
-
-        
-
-
-
-
+    # Check test accuracy
+    y_pred = model.forward(X_test)
+    accuracy = np.sum(y_pred == y_test) / len(y_test)
+    print(f"Test Accuracy: {accuracy:.4f}")
