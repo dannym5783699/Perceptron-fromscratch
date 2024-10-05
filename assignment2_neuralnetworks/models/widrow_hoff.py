@@ -15,7 +15,7 @@ class WidrowHoff:
             tol: float = 1e-4,
             max_epochs=100,
             verbose: int = 0,
-            useBias: bool = False,
+            useBias: bool = True,
             plot: bool = False,  # Added plot flag
             show_percent_complete: bool = False
     ) -> None:
