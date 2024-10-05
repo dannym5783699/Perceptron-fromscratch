@@ -3,13 +3,12 @@ from sklearn.datasets import load_iris
 
 import numpy as np
 class WestonWatkinsSVM:
-    def __init__(self, n_features, n_classes, lr = 0.1):
-        #create a (classes, inDem) weight array for all output neurons depending on inputs and classes.
+    def __init__(self, n_features : int, n_classes : int , lr : float = 0.1, max_epochs : int = 1000):
         self._W = np.random.rand(n_classes, n_features)
-        #create a random bias vector
         self._b = np.random.rand(n_classes)
         self._lr = lr
         self.n_classes = n_classes
+        self._max_epochs = max_epochs
 
 
     def predict(self, x):
@@ -18,9 +17,9 @@ class WestonWatkinsSVM:
     def forward(self, x):
         return np.argmax(self.predict(x), axis = 1)
     
-    def fit(self, x : np.ndarray, y : np.ndarray, epoch = 1000):
+    def fit(self, x : np.ndarray, y : np.ndarray):
         #Loop over all points for each epoch
-        for m in range(epoch):
+        for m in range(self._max_epochs):
             if(m % 10 == 0):
                 print("Epoch: ", m)
             #expects a column vector for x and y.
@@ -45,6 +44,7 @@ class WestonWatkinsSVM:
 if __name__ == "__main__":
 
     LR = 1e-4
+    N_EPOCHS = 1000
 
     X, y = load_iris(return_X_y=True)
     n_features = X.shape[1]
@@ -57,8 +57,8 @@ if __name__ == "__main__":
     print("Number of classes: ", n_classes)
 
     # Train model    
-    model = WestonWatkinsSVM(n_features, n_classes, LR)
-    model.fit(X_train, y_train, 500)
+    model = WestonWatkinsSVM(n_features, n_classes, LR, N_EPOCHS)
+    model.fit(X_train, y_train)
 
     # Check test accuracy
     y_pred = model.forward(X_test)
