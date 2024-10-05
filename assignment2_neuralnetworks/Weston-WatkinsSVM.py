@@ -34,8 +34,7 @@ class WestonWatkinsSVM:
                 loss_terms[y[i]] = 0                            # Set the loss of the true class to zero
                 delta = np.where(loss_terms > 0, 1, 0)          # Indicator function for each r
 
-                # Set the delta for the true class to be the sum of all other deltas 
-                # We can remove the correct class with - 1 since y_hat - y_hat_i == 0 for the true class
+                # Set the delta for the true class to be the sum of all other deltas for the update 
                 delta[y[i]] = -np.sum(delta)
 
                 # Update weights
