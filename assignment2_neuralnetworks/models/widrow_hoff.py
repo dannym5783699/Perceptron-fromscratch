@@ -16,7 +16,8 @@ class WidrowHoff:
             max_epochs=100,
             verbose: int = 0,
             useBias: bool = False,
-            plot: bool = False  # Added plot flag
+            plot: bool = False,  # Added plot flag
+            show_percent_complete: bool = False
     ) -> None:
         """Widrow-Hoff (LMS) learning model with a single output.
 
@@ -40,6 +41,7 @@ class WidrowHoff:
         self._useBias = useBias
         self._plot = plot  # Initialize plot flag
         self._e_squared_totals = []  # Store error values for plotting
+        self._show_percent_complete = show_percent_complete
 
     def _validate_input(self, x: np.ndarray, y: np.ndarray) -> None:
         if x.shape[1] != self._n_features:
@@ -147,15 +149,17 @@ class WidrowHoff:
                     print(f"Finished training with {n_samples} samples.")
                     print(f"Final weights: {self._W}")
                 break
-            sys.stdout.write(f"\rPercent Complete: {((current_epoch / self._max_epochs)*100):.4f}%")
-            sys.stdout.flush()
+
+            if self._show_percent_complete:
+                sys.stdout.write(f"\rPercent Complete: {((current_epoch / self._max_epochs)*100):.4f}%")
+                sys.stdout.flush()
 
         # Plot the error over epochs if plot flag is set
         if self._plot:
             self.plot_error()
-
-        print(f"\rFinished training with {n_samples} samples.")
+        
         if self._verbose > 0:
+            print(f"\rFinished training with {n_samples} samples.")
             print(f"Final weights: {self._W}")
 
     def plot_error(self) -> None:
