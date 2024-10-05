@@ -13,7 +13,7 @@ class WestonWatkinsSVM:
 
 
     def predict(self, x):
-        return self._W @ x.T + self._b
+        return np.dot(x, self._W.T) + self._b
     
     def forward(self, x):
         return np.argmax(self.predict(x), axis = 1)
@@ -27,7 +27,7 @@ class WestonWatkinsSVM:
             for i in range(len(y)):
                 x_i = x[i]
                 
-                y_hat = self.predict(x_i)
+                y_hat = self._W @ x_i.T + self._b
 
                 y_hat_i = y_hat[y[i]]                           # seperator of true class
                 loss_terms = np.maximum(y_hat - y_hat_i + 1, 0) # Compute the loss for each class separator
