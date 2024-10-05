@@ -12,60 +12,35 @@ class WestonWatkinsSVM:
         self.n_classes = n_classes
 
 
-    def outVals(self, x):
-        #Get vector of predictions.
-        y_hat = np.dot(self._W, x)
-        #Add bias and reshape for final class prediction and loss.
-        return (y_hat.reshape(-1, 1) + self._b)
-    
+    def predict(self, x):
+        return self._W @ x.T + self._b
     
     def forward(self, x):
-        out = self.outVals(x)
-        #Pick the neuron with highest output value as the class prediction.
-        return np.argmax(out)
+        return np.argmax(self.predict(x), axis = 1)
     
-    #determine individual loss contribution from each output neuron for a specific sample.
-    def indLoss(self, y, y_hat):
-        loss = np.zeros(self.n_classes)
-        #get loss contribution of each neuron, correct neuron is set to 0.
-        for i in range(self.n_classes):
-            if(i != y):
-                loss[i] = max(0, y_hat[i, 0] - y_hat[int(y), 0] + 1)
-            else:
-                #Loss contribution for the correct neuron is set to zero.
-                loss[i] = 0;  
-        return loss
-    
-
-    
-    def fit(self, x, y, epoch = 1000):
+    def fit(self, x : np.ndarray, y : np.ndarray, epoch = 1000):
         #Loop over all points for each epoch
         for m in range(epoch):
             if(m % 10 == 0):
                 print("Epoch: ", m)
             #expects a column vector for x and y.
             for i in range(len(y)):
-                #get column vector for a single sample.
-                x_i = x[:,i]
-                #get the outputs of the output neurons.
-                y_hat = self.outVals(x_i)
-                #get the array of loss contributions for weight updates.
-                lossContr = self.indLoss(y[i], y_hat)
-                #Using the indicator function on each element.
-                indicator = np.where(lossContr > 0, 1, 0).reshape(-1,1)
-                #get the sum of the indicator elements for correct neuron weight updates.
-                sIndicator = np.sum(indicator)
-                #update the weights and bias.
-                for w in range(self.n_classes):
-                    if(w == y[i]):
-                        self._b[w, 0] = self._b[w, 0] + ((self._lr)*(sIndicator))
-                        self._W[w, :] = self._W[w, :] + ((self._lr*x_i.T)*(sIndicator))
-                    else:
-                        self._b[w, 0] = self._b[w, 0] - ((self._lr)*(indicator[w, 0]))
-                        self._W[w, :] = self._W[w, :] - ((self._lr*x_i.T)*(indicator[w, 0]))
+                x_i = x[i]
+                
+                y_hat = self.predict(x_i)
 
-                #TODO: uncomment bias and update them.
+                y_hat_i = y_hat[y[i]]                           # seperator of true class
+                loss_terms = np.maximum(y_hat - y_hat_i + 1, 0) # Compute the loss for each class separator
+                loss_terms[y[i]] = 0                            # Set the loss of the true class to zero
+                delta = np.where(loss_terms > 0, 1, 0)          # Indicator function for each r
 
+                # Set the delta for the true class to be the sum of all other deltas 
+                # We can remove the correct class with - 1 since y_hat - y_hat_i == 0 for the true class
+                delta[y[i]] = -np.sum(delta)
+
+                # Update weights
+                self._W -= self._lr * np.outer(delta, x_i)
+                self._b -= self._lr * delta
 
 
 if __name__ == "__main__":
