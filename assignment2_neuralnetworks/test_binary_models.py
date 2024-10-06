@@ -4,7 +4,7 @@ import pandas as pd
 from classifier_wrapper import ClassifierWrapper
 from models import LinearSVM, LogisticRegression, WidrowHoff
 from sklearn.datasets import fetch_openml, load_breast_cancer, load_iris
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, RepeatedStratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -58,7 +58,8 @@ if __name__ == "__main__":
     ])
 
     # Initialize GridSearchCV with the ClassifierWrapper and the parameter grid
-    grid_search = GridSearchCV(pipeline, param_grid, cv=5, verbose=1, n_jobs=-1)
+    cv = RepeatedStratifiedKFold(n_splits=5, n_repeats=3, random_state=42)
+    grid_search = GridSearchCV(pipeline, param_grid, cv=cv, verbose=1, n_jobs=-1)
 
     for dataset_name, (X, y) in datasets.items():
         # Set n_features for WidrowHoff

@@ -4,7 +4,7 @@ import pandas as pd
 from classifier_wrapper import ClassifierWrapper
 from models import WestonWatkinsSVM
 from sklearn.datasets import load_iris
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, RepeatedStratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -30,7 +30,8 @@ if __name__ == "__main__":
         ('classifier', ClassifierWrapper(model_class=None))
     ])
 
-    grid_search = GridSearchCV(pipeline, param_grid, cv=3, verbose=1, n_jobs=-1)
+    cv = RepeatedStratifiedKFold(n_splits=5, n_repeats=3, random_state=42)
+    grid_search = GridSearchCV(pipeline, param_grid, cv=cv, verbose=1, n_jobs=-1)
 
 
     print(f"Running CV for Weston Watkins SVM")
