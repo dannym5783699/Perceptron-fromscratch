@@ -60,7 +60,7 @@ if __name__ == "__main__":
     model = WestonWatkinsSVM(n_features, n_classes, LR, N_EPOCHS)
     model.fit(X_train, y_train)
 
-    # Check test accuracy
+    # Check tests accuracy
     y_pred = model.forward(X_test)
     accuracy = np.sum(y_pred == y_test) / len(y_test)
     print(f"Test Accuracy: {accuracy:.4f}")
