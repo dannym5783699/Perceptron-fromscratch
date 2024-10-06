@@ -18,6 +18,14 @@ learning set that can be run using the Test Weston Watkins script.
 - `tests` : Contains all the test scripts to run the 4 Classification Models
 
 ## Build Poetry Environment
+### Environment Requirements
+- Python 3.9 or later
+- Pip installer
+### Install Poetry
+```bash
+pip install poetry
+```
+### Set up Local Environment
 - Use the following lines in your terminal to set up the Poetry Environment With all dependent libraries.
 ```bash
 poetry shell
