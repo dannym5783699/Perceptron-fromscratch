@@ -8,11 +8,17 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.9"
 numpy = "^1.21"
-matplotlib = "*"
-seaborn = "*"
-scikit-learn = "*"
+pandas = "^2.2.3"
+scikit-learn = "^1.5.2"
+matplotlib = "^3.9.2"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+RunWH = "tests.test_widrow_hoff:main"
+RunBM = "tests.test_binary_models:main"
+RunWW = "tests.test_ww_svm:main"
+

@@ -1,8 +1,8 @@
 from pathlib import Path
 
 import pandas as pd
-from classifier_wrapper import ClassifierWrapper
-from models import LinearSVM, LogisticRegression, WidrowHoff
+from assignment2_neuralnetworks.classifier_wrapper import ClassifierWrapper
+from assignment2_neuralnetworks.models import LinearSVM, LogisticRegression, WidrowHoff
 from sklearn.datasets import fetch_openml, load_breast_cancer, load_iris
 from sklearn.model_selection import GridSearchCV, RepeatedStratifiedKFold
 from sklearn.pipeline import Pipeline
@@ -10,50 +10,51 @@ from sklearn.preprocessing import StandardScaler
 
 
 def get_iris_binary():
-    X_iris, y_iris = load_iris(return_X_y=True)
+    x_matrix_iris, y_iris = load_iris(return_X_y=True)
     # Make the iris dataset binary by removing the class with label 2
-    X_iris = X_iris[y_iris != 2]
+    x_matrix_iris = x_matrix_iris[y_iris != 2]
     y_iris = y_iris[y_iris != 2]
     # Convert the labels to binary
     y_iris = (y_iris == 1).astype(int)
-    return X_iris, y_iris
+    return x_matrix_iris, y_iris
+
 
 def get_titanic():
     """https://openml.org/search?type=data&status=active&sort=nr_of_downloads&id=42438"""
-    X, y = fetch_openml(data_id=42438, return_X_y=True)
-    return X, y
+    x_matrix, y = fetch_openml(data_id=42438, return_X_y=True)
+    return x_matrix, y
 
-if __name__ == "__main__":
 
+def main():
     cv_results_directory = Path(__file__).parent.parent / "cv_results"
 
     datasets = {
         "breast_cancer": load_breast_cancer(return_X_y=True),
         "iris": get_iris_binary(),
-        "titanic" : get_titanic()
+        "titanic": get_titanic()
     }
-    
-    LEARNING_RATES = [1e-2, 1e-4, 1e-8]
-    MAX_EPOCHS = [10, 50, 100, 500]
+
+    learning_rates = [1e-2, 1e-4, 1e-8]
+    max_epochs = [10, 50, 100, 500]
 
     param_grid = [
         # Parameter grid for WidrowHoff (which needs n_features)
         {
             'classifier__model_class': [WidrowHoff],
             'classifier__n_features': None,  # Only for WidrowHoff
-            'classifier__lr': LEARNING_RATES,
-            'classifier__max_epochs': MAX_EPOCHS
+            'classifier__lr': learning_rates,
+            'classifier__max_epochs': max_epochs
         },
         # Parameter grid for models that do not need n_features
         {
             'classifier__model_class': [LinearSVM, LogisticRegression],
-            'classifier__lr': LEARNING_RATES,
-            'classifier__max_epochs': MAX_EPOCHS
+            'classifier__lr': learning_rates,
+            'classifier__max_epochs': max_epochs
         }
     ]
 
     pipeline = Pipeline([
-        ('scaler', StandardScaler()), 
+        ('scaler', StandardScaler()),
         ('classifier', ClassifierWrapper(model_class=None))
     ])
 
@@ -77,3 +78,5 @@ if __name__ == "__main__":
         save_results.to_csv(results_fpath, index=False)
 
 
+if __name__ == "__main__":
+    main()

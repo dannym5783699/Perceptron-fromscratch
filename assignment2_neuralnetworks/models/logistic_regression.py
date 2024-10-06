@@ -78,7 +78,7 @@ if __name__ == "__main__":
     lr = LogisticRegression(learning_rate=0.01, epochs=1000)
     lr.fit(X_train, y_train)
 
-    # Make predictions on the test set
+    # Make predictions on the tests set
     predictions = lr.predict(X_test)
 
     # Calculate accuracy
